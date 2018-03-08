@@ -1,0 +1,62 @@
+---
+title: "class 18: Cancer Genomics"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Load in packages
+```{r}
+source("https://bioconductor.org/biocLite.R")
+biocLite(c("GenomicDataCommons", "maftools"))
+library(GenomicDataCommons)
+library(maftools)
+```
+
+Check GDC status:
+```{r}
+GenomicDataCommons::status()
+
+```
+
+Summarize cases by project:
+```{r}
+cases_by_project <- cases() %>%
+  facet("project.project_id") %>%
+  aggregations()
+head(cases_by_project)
+View(cases_by_project)
+```
+
+Create a barplot of the data
+```{r}
+
+x <- cases_by_project$project.project_id
+
+colvec <- rep("lightblue", nrow(x))
+colvec[which(x[,1]=="TCGA-PAAD")] <- "red"
+
+par(mar=c(9, 4, 4, 2))
+barplot(x[,2], 
+        log = "y", 
+        las = 2,
+        names.arg = x[,1],
+        col = colvec)
+
+```
+
+‘find all gene expression data files for all pancreatic cancer patients'
+```{r}
+## This code snipet is taken from the package vignette
+file_records <- files() %>%
+  filter(~ cases.project.project_id == "TCGA-PAAD" &
+    data_type == "Gene Expression Quantification" &
+    analysis.workflow_type == "HTSeq - Counts") %>%
+  response_all()
+
+View(file_records)
+file_records$results
+```
+
