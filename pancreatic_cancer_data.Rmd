@@ -60,3 +60,81 @@ View(file_records)
 file_records$results
 ```
 
+```{r}
+maf.files = files() %>%
+    filter(~ cases.project.project_id == 'TCGA-PAAD' &
+        data_type == 'Masked Somatic Mutation' &
+        data_format == "MAF" &
+        analysis.workflow_type == "MuTect2 Variant Aggregation and Masking"
+    ) %>%
+    response_all()
+
+View(maf.files$results)
+
+head(maf.files$results)
+```
+
+```{r}
+uid <- ids(maf.files)
+uid
+```
+
+```{r}
+maffile <- gdcdata(uid, destination_dir =".")
+maffile
+```
+
+Read the maf file
+```{r}
+vars = read.maf(maf = maffile, verbose = FALSE)
+```
+
+Draw oncoplot
+```{r}
+paad.oncoplot <- oncoplot(maf = vars, top = 10)
+paad.oncoplot
+```
+
+MAF summary
+```{r}
+plotmafSummary(maf =vars, rmOutlier = TRUE,
+               addStat = 'median', dashboard = TRUE,
+               titvRaw = FALSE)
+```
+
+```{r}
+z <- oncostrip(maf = vars, genes = c("KRAS", "TP53", "SMAD4"))
+View(z)
+oncostrip(maf=vars, genes=c("KRAS", "TP53"))
+```
+
+
+Hands on Worksheet #2
+```{r}
+library(bio3d)
+
+
+aln.p53 <- read.fasta("lecture18_sequences.fa")
+
+seq.p53 <- seqaln(aln.p53)
+View(seq.p53)
+seq.p53$ali <-seq.p53$ali[, 1:262]
+seq.p53
+```
+
+```{r}
+seq.p53.vars <- conserv(seq.p53, method = "identity")
+seq.p53.vars
+```
+
+```{r}
+which(seq.p53.vars < 1)
+
+```
+
+Three positions are actually different between the sequences
+
+```{r}
+
+```
+
